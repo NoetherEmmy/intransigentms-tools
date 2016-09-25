@@ -11,7 +11,7 @@ for file in os.listdir("Mob.wz"):
         with open("Mob.wz/" + file, "r") as f:
             lines = f.readlines()
             for line in lines:
-                if "<int name=\"undead\" value=\"1\"" in line:
+                if "<int name=\"deadlyAttack\" value=\"1\"" in line:
                     candidates.append(file)
                     break
 
