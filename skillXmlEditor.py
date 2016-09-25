@@ -1,5 +1,6 @@
 # Used for modifying skill XMLs (from Skill.wz) to change skill values (in the "level" nodes)
 # Supports adding/subtracting, multiplying, setting, but could easily be tweaked for a lot of things.
+# Prints the number of individual values changed, for verification purposes.
 
 filename = input("Enter the filename, or absolute/relative file path if not in this folder, of the skill XML: ")
 skillid = int(input("Enter the ID of the skill you wish to edit: "))
