@@ -6,7 +6,7 @@ filename = input("Enter the filename, or absolute/relative file path if not in t
 skillid = int(input("Enter the ID of the skill you wish to edit: "))
 attribute = input("Enter the attribute you wish to modify (e.g. \"mad\" for magic attack damage): ")
 add = int(input("Enter how much you would like to add to the attribute at every level of the skill (can be negative): "))
-multi = float(input("Enter how much you would like to multiply the atrribute by at every level: "))
+multi = float(input("Enter how much you would like to multiply the attribute by at every level: "))
 setto = 0
 try:
     setto = int(input("Enter what you would like to set the attribute to at all levels (enter anything that is not an integer to ignore): "))
@@ -39,7 +39,7 @@ with open(filename, "r") as f:
         if setto != -60001:
             newvalue = setto
         else:
-            newvalue = int(value) * multi
+            newvalue = int(int(value) * multi)
             newvalue += add
         newvalue = str(newvalue)
         if len(newvalue) != len(value):
