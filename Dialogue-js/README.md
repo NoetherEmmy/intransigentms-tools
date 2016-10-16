@@ -22,7 +22,7 @@ Create a new dialogue variable like so:
 ```javascript
 var myDialogue = Dialogue.load(transcript[, options]);
 ```
-Where `transcript` is a Javascript object (hard-coded or from a *.json) containing the dialogue's transcript formatted as specified in "Transcript Format" below, and `options` is an optional argument consisting of an object with any of the properties as defined below in "Options".
+Where `transcript` is a Javascript object (hard-coded or from a *.json) containing the dialogue's transcript formatted as specified in [Transcript Format](#transcript-format) below, and `options` is an optional argument consisting of an object with any of the properties as defined below in [Options](#options).
 
 You only want to call this function once, so a good paradigm is to put any instances of the `load()` function in your NPC's `start()` function, or at least qualify them with some conditional.
 
@@ -58,7 +58,7 @@ myDialogue.unload();
 
 <a name="transcript-format">Transcript Format</a>
 -----------------
-Perhaps the best way to figure out the format is to simply check the example under the "Example" header below.
+Perhaps the best way to figure out the format is to simply check the example under the [Example](#example) header below.
 
 Transcripts are objects (denoted with `{ }`), with objects/arrays nested inside to create a tree structure.
 Each object has a `prompt` property, which holds a string containing whatever the NPC says at that point.
