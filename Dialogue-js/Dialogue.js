@@ -20,6 +20,21 @@ var Dialogue = (function() {
                     return lastPrompt;
                 }
 
+                function findId(node, id) {
+                    var stack = [node];
+                    while (stack.length > 0) {
+                        var n = stack.pop();
+                        if (n.id === id) return n;
+                        if (n.choices) {
+                            for (var i = 0; i < n.choices.length; ++i) {
+                                if (Array.isArray(n.choices[i])) {
+                                    stack.push(n.choices[i][1]);
+                                }
+                            }
+                        }
+                    }
+                }
+
                 var i;
                 if (selection !== undefined) {
                     if (selection == -1) {
@@ -47,6 +62,15 @@ var Dialogue = (function() {
                         node = convo;
                         for (i = 0; i < nodeIndex.length; ++i) {
                             node = node.choices[nodeIndex[i]][1];
+                        }
+                    }
+
+                    if (node.goto !== undefined) {
+                        var id = node.goto;
+                        node = findId(convo, id);
+
+                        if (!node) {
+                            throw ReferenceError("There exists no such node with the id " + id);
                         }
                     }
                 }
@@ -81,7 +105,7 @@ var Dialogue = (function() {
 
             var setNoDispose = function(nd) {
                 opts.nodispose = nd;
-            }
+            };
 
             var unload = function() {
                 convo = opts = node = nodeIndex = lastPrompt = void 0;
