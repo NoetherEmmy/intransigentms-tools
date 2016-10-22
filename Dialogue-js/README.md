@@ -72,7 +72,7 @@ In addition, it has a `choices` property (actually optional, sends an "OK" dialo
 
 Objects that would normally have `prompt`s and `choices`s can also *instead* be either **movement nodes** or **goto nodes**. These objects, instead of having `prompt` and `choices`, have a single property called either `move` or `goto`, which is an integer:
 
-* `goto === x` : Moves directly to the first node `n` in the dialogue tree such that `n.id === x`. Any node can have an `id` property.
+* `goto === x` : Moves directly to the first node `n` in the dialogue tree such that `n.id === x`. Any node can have an `id` property. Throws `ReferenceError` if no such node `n` exists in the dialogue tree.
 * `move < 0` : Backtracks `move` nodes in the dialogue tree, e.g. `move: -1` would act similarly to a *Previous* button.
 * `move > 0` : Guaranteed to exit chat if this is selected.
 * `move === 0` : Counts as if the player selected "End Chat" (viz.: `selection = -1`).
