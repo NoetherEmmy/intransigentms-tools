@@ -135,10 +135,11 @@ var myTranscript = {
             ]
         }],
         ["Err... I actually think it's great. I enjoy it #eevery time#n I rewrite the same thing.", {
+            id: 1,
             prompt: "Bullshit. Just for that, I've trapped you in this dialogue box.",
             choices: [
                 ["D:", {
-                    move: 0
+                    goto: 1
                 }]
             ]
         }]
