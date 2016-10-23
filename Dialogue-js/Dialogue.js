@@ -22,8 +22,9 @@ var Dialogue = (function() {
 
                 function findId(node, id) {
                     var stack = [node];
+                    var n;
                     while (stack.length > 0) {
-                        var n = stack.pop();
+                        n = stack.pop();
                         if (n.id === id) return n;
                         if (n.choices) {
                             for (var i = 0; i < n.choices.length; ++i) {
@@ -35,7 +36,7 @@ var Dialogue = (function() {
                     }
                 }
 
-                var i;
+                var i, newPrompt;
                 if (selection !== undefined) {
                     if (selection == -1) {
                         if (opts.endchat == "continue") {
@@ -67,6 +68,7 @@ var Dialogue = (function() {
 
                     if (node.goto !== undefined) {
                         var id = node.goto;
+                        newPrompt = node.prompt;
                         node = findId(convo, id);
 
                         if (!node) {
@@ -75,8 +77,8 @@ var Dialogue = (function() {
                     }
                 }
 
-                if (!node || !node.prompt) return exit();
-                lastPrompt = node.prompt;
+                if (!node || (!node.prompt && newPrompt === undefined)) return exit();
+                lastPrompt = newPrompt === undefined ? node.prompt : newPrompt;
                 if (!node.choices) {
                     cm.sendOk(lastPrompt);
                     return exit();
@@ -87,7 +89,7 @@ var Dialogue = (function() {
                 for (i = 0; i < choices.length; ++i) {
                     var choice = choices[i];
                     if (choice[1].move !== undefined) {
-                        message += "#L" + (choice[1].move > 0 ? i : (choice[1].move == 0 ? -1 : choice[1].move - 2)) + "#" + choice[0] + "#l\r\n";
+                        message += "#L" + (choice[1].move > 0 ? i : (choice[1].move === 0 ? -1 : choice[1].move - 2)) + "#" + choice[0] + "#l\r\n";
                     } else {
                         message += "#L" + i + "#" + (Array.isArray(choice) ? choice[0] : choice) + "#l\r\n";
                     }
