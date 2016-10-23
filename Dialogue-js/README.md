@@ -82,7 +82,7 @@ Objects that would normally have `prompt`s and `choices`s can also *instead* be 
 
 <a name="options">Options</a>
 -------
-* `endchat` : Controls the behavior for when `selection === -1`, i.e. the player presed "End Chat", or hit a node with `move === 0`.
+* `endchat` : Controls the behavior for when `selection === -1`, i.e. the player pressed "End Chat", or hit a node with `move === 0`.
     - Possible values:
         + `"exit"` : This is the default value, and exits normally, calling the `callback` if there is one, and returning the last prompt displayed to the player.
         + `"continue"` : Behaves as if the user selected the first option (`selection = 0`).
