@@ -32,11 +32,12 @@ with open(filename, "r") as f:
         thevalue = ""
         valuefirstindex = -1
         while True:
-            currentindex += 1
             if line[currentindex] in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', ','] and currentindex < skillendindex:
                 thevalue += line[currentindex]
                 valuefirstindex = currentindex
                 break
+            else:
+                currentindex += 1
         while line[currentindex] in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', ',']:
             thevalue += line[currentindex]
             currentindex += 1
