@@ -18,38 +18,48 @@ attributeschangedcount = 0
 
 with open(filename, "r") as f:
     lines = f.readlines()
-    if len(lines) > 1:
-        raise IOError("XML file is not all in one line.")
-    line = lines[0]
-    skillstartindex = line.find("<imgdir name=\"" + str(skillid) + "\">")
-    if skillstartindex == -1:
-        raise ValueError("Could not find specified skill ID.")
-    skillstartindex = line.find("<imgdir name=\"level\">", skillstartindex + 5)
-    skillendindex = line.find("<imgdir name=\"effect\">", skillstartindex + 5)
-    if skillendindex == -1:
-        skillendindex = len(line)
-    attributeindex = line.find("name=\"" + attribute + "\"", skillstartindex + 5)
-    while attributeindex != -1 and attributeindex < skillendindex:
-        valuestart = line.find("value=\"", attributeindex)
-        beginning = line[:valuestart + 7]
-        valueend = line.find("\"/", valuestart + 7)
-        value = line[valuestart + 7:valueend]
-        end = line[valueend:]
-        newvalue = 0
-        if setto != -60001:
-            newvalue = setto
-        else:
-            newvalue = int(int(value) * multi)
-            newvalue += add
-        newvalue = str(newvalue)
-        if len(newvalue) != len(value):
-            difference = len(newvalue) - len(value)
-            skillendindex += difference
-        value = newvalue
-        line = beginning + value + end
-        attributeschangedcount += 1
-        attributeindex = line.find("name=\"" + attribute + "\"", attributeindex + 2)
-    out = line
+
+if len(lines) > 1:
+    raise IOError("XML file is not all in one line.")
+
+line = lines[0]
+skillstartindex = line.find("<imgdir name=\"" + str(skillid) + "\">")
+if skillstartindex == -1:
+    raise ValueError("Could not find specified skill ID.")
+
+skillstartindex = line.find("<imgdir name=\"level\">", skillstartindex + 5)
+skillendindex = line.find("<imgdir name=\"effect\">", skillstartindex + 5)
+if skillendindex == -1:
+    skillendindex = len(line)
+
+attributeindex = line.find("name=\"" + attribute + "\"", skillstartindex + 5)
+while attributeindex != -1 and attributeindex < skillendindex:
+    valuestart = line.find("value=\"", attributeindex)
+    beginning = line[:valuestart + 7]
+    valueend = line.find("\"/", valuestart + 7)
+    value = line[valuestart + 7:valueend]
+    end = line[valueend:]
+
+    newvalue = 0
+    if setto != -60001:
+        newvalue = setto
+    else:
+        newvalue = int(int(value) * multi)
+        newvalue += add
+
+    newvalue = str(newvalue)
+
+    if len(newvalue) != len(value):
+        difference = len(newvalue) - len(value)
+        skillendindex += difference
+
+    value = newvalue
+    line = beginning + value + end
+
+    attributeschangedcount += 1
+    
+    attributeindex = line.find("name=\"" + attribute + "\"", attributeindex + 2)
+out = line
 
 with open(filename, "w") as f:
     f.write(out)

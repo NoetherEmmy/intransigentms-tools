@@ -18,53 +18,58 @@ attributeschangedcount = 0
 
 with open(filename, "r") as f:
     lines = f.readlines()
-    if len(lines) > 1:
-        raise IOError("XML file is not all in one line.")
-    line = lines[0]
-    skillstartindex = line.find("<imgdir name=\"" + str(skillid).zfill(7) + "\">")
-    if skillstartindex == -1:
-        raise ValueError("Could not find specified skill ID.")
-    skillendindex = line.find("</imgdir>", skillstartindex)
-    currentindex = line.find("<string name=\"h1\"", skillstartindex)
-    currentindex = line.find(attribute, currentindex) + len(attribute)
 
-    while currentindex > skillstartindex and currentindex < skillendindex:
-        thevalue = ""
-        valuefirstindex = -1
-        while True:
-            if line[currentindex] in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', ','] and currentindex < skillendindex:
-                thevalue += line[currentindex]
-                valuefirstindex = currentindex
-                break
-            else:
-                currentindex += 1
-        while line[currentindex] in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', ',']:
+if len(lines) > 1:
+    raise IOError("XML file is not all in one line.")
+
+line = lines[0]
+skillstartindex = line.find("<imgdir name=\"" + str(skillid).zfill(7) + "\">")
+if skillstartindex == -1:
+    raise ValueError("Could not find specified skill ID.")
+
+skillendindex = line.find("</imgdir>", skillstartindex)
+currentindex = line.find("<string name=\"h1\"", skillstartindex)
+currentindex = line.find(attribute, currentindex) + len(attribute)
+
+while currentindex > skillstartindex and currentindex < skillendindex:
+    thevalue = ""
+    valuefirstindex = -1
+    while True:
+        if line[currentindex] in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', ','] and currentindex < skillendindex:
             thevalue += line[currentindex]
+            valuefirstindex = currentindex
+            currentindex += 1
+            break
+        else:
             currentindex += 1
 
-        thevalue = thevalue.replace(",", "")
+    while line[currentindex] in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '-', ',']:
+        thevalue += line[currentindex]
+        currentindex += 1
 
-        newvalue = 0
-        if setto != -60001:
-            newvalue = setto
-        else:
-            newvalue = int(int(thevalue) * multi)
-            newvalue += add
-        newvalue = str(newvalue)
-        
-        beginning = line[:valuefirstindex]
-        end = line[currentindex:]
-        line = beginning + newvalue + end
-        attributeschangedcount += 1
+    thevalue = thevalue.replace(",", "")
 
-        if len(newvalue) != len(thevalue):
-            difference = len(newvalue) - len(thevalue)
-            skillendindex += difference
-            currentindex += difference
-
-        currentindex = line.find(attribute, currentindex) + len(attribute)
+    newvalue = 0
+    if setto != -60001:
+        newvalue = setto
+    else:
+        newvalue = int(int(thevalue) * multi)
+        newvalue += add
+    newvalue = str(newvalue)
     
-    out = line
+    beginning = line[:valuefirstindex]
+    end = line[currentindex:]
+    line = beginning + newvalue + end
+    attributeschangedcount += 1
+
+    if len(newvalue) != len(thevalue):
+        difference = len(newvalue) - len(thevalue)
+        skillendindex += difference
+        currentindex += difference
+
+    currentindex = line.find(attribute, currentindex) + len(attribute)
+
+out = line
 
 with open(filename, "w") as f:
     f.write(out)
