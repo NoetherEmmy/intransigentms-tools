@@ -15,14 +15,14 @@ except:
 
 out = ""
 attributeschangedcount = 0
+line = ""
 
 with open(filename, "r") as f:
     lines = f.readlines()
+    if len(lines) > 1:
+        raise IOError("XML file is not all in one line.")
+    line = lines[0]
 
-if len(lines) > 1:
-    raise IOError("XML file is not all in one line.")
-
-line = lines[0]
 skillstartindex = line.find("<imgdir name=\"" + str(skillid).zfill(7) + "\">")
 if skillstartindex == -1:
     raise ValueError("Could not find specified skill ID.")
