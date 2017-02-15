@@ -1,5 +1,19 @@
-# Takes in comma-spaced multi-line arrays and makes
-# the items spaced evenly.
+#!/usr/bin/env python3
+
+"""
+Python 3.x.x
+
+Takes in a wrapped Javascript or Python list, like::
+
+    var list =
+    [
+        "eawhr", "arhhrtjetj", "fe", "eeeeee",
+        "wgewhr", "3rhehe", "4", "5%%%%%%%%%%%%%",
+        "!!!!!", ",,", "1", "'"
+    ];
+
+and spaces it out to look neat.
+"""
 
 import re
 
@@ -41,5 +55,6 @@ for line in lines:
 
 newfilename = ".".join(filename.split(".")[:-1]) + \
     ".spaced." + filename.split(".")[-1]
+
 with open(newfilename, "w") as f:
     f.write(out)

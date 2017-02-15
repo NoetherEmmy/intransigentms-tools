@@ -1,9 +1,25 @@
-# This is used for downgrading equipment from higher (post-BB) versions to a style that old clients (like v62)
-# can read. Checks for references what include a full path (e.g. Character/weapon/4424242.img/default/0/1) and
-# forces them to use abbreviations (e.g. ../../default/0/1).
-# Uses XMLs exported from HaRepacked as classic XML.
-# Requires xmltodict:
-#     $ pip install xmltodict
+#!/usr/bin/env python3
+
+"""
+Python 3.6.x
+
+**WARNING:** This script is old and stale. It definitely has bugs,
+and in addition, converting links to UOLs is a very dirty way to
+do this that will come up with sometimes wonky-looking results.
+Use at your own risk.
+
+This is used for downgrading equipment from higher (post-BB)
+versions to a style that old clients (like v62) can read.
+
+Checks for references what include a full path
+(e.g. ``Character/weapon/4424242.img/default/0/1``) and
+forces them to use abbreviations/UOLs (e.g. ``../../default/0/1``).
+
+Uses XMLs exported from HaRepacked as classic XML.
+
+Requires:
+    xmltodict (to install: ``pip install xmltodict``)
+"""
 
 from collections import OrderedDict
 import os
@@ -13,7 +29,9 @@ import xmltodict
 
 root = tk.Tk()
 root.withdraw()
-filepaths = filedialog.askopenfilenames(filetypes=[("XML files", ".xml")], title="Select the dumped *.img.xml files you would like to be edited:")
+filepaths = filedialog.askopenfilenames(filetypes=[(
+    "XML files", ".xml")],
+    title="Select the dumped *.img.xml files you would like to be edited:")
 
 for filepath in filepaths:
     fp = open(filepath)
@@ -25,111 +43,146 @@ for filepath in filepaths:
         if img["imgdir"]["imgdir"][index]["@name"] != "info":
             try:
                 if type(img["imgdir"]["imgdir"][index]["imgdir"]) is list:
-                    sublistlength = len(img["imgdir"]["imgdir"][index]["imgdir"])
+                    sublistlength = len(
+                        img["imgdir"]["imgdir"][index]["imgdir"])
                     for numberedsub in range(sublistlength):
-                        numberedsubname = img["imgdir"]["imgdir"][index]["imgdir"][numberedsub]["@name"]
+                        numberedsubname = img["imgdir"]["imgdir"][
+                            index]["imgdir"][numberedsub]["@name"]
                         rawsources = []
                         canvasnames = []
                         try:
                             if type(img["imgdir"]["imgdir"][index]["imgdir"][numberedsub]["canvas"]) is list:
-                                canvascount = len(img["imgdir"]["imgdir"][index]["imgdir"][numberedsub]["canvas"])
+                                canvascount = len(img["imgdir"]["imgdir"][index][
+                                                  "imgdir"][numberedsub]["canvas"])
                                 for canvasindex in range(canvascount):
                                     hassource = False
                                     if type(img["imgdir"]["imgdir"][index]["imgdir"][numberedsub]["canvas"][canvasindex]["string"]) is list:
-                                        stringcount = len(img["imgdir"]["imgdir"][index]["imgdir"][numberedsub]["canvas"][canvasindex]["string"])
+                                        stringcount = len(img["imgdir"]["imgdir"][index]["imgdir"][
+                                                          numberedsub]["canvas"][canvasindex]["string"])
                                         for stringindex in range(stringcount):
                                             if img["imgdir"]["imgdir"][index]["imgdir"][numberedsub]["canvas"][canvasindex]["string"][stringindex]["@name"] == "source":
-                                                rawsources.append(img["imgdir"]["imgdir"][index]["imgdir"][numberedsub]["canvas"][canvasindex]["string"][stringindex]["@value"])
+                                                rawsources.append(img["imgdir"]["imgdir"][index]["imgdir"][numberedsub][
+                                                                  "canvas"][canvasindex]["string"][stringindex]["@value"])
                                                 hassource = True
                                     else:
                                         if img["imgdir"]["imgdir"][index]["imgdir"][numberedsub]["canvas"][canvasindex]["string"]["@name"] == "source":
-                                            rawsources.append(img["imgdir"]["imgdir"][index]["imgdir"][numberedsub]["canvas"][canvasindex]["string"]["@value"])
+                                            rawsources.append(img["imgdir"]["imgdir"][index]["imgdir"][numberedsub][
+                                                              "canvas"][canvasindex]["string"]["@value"])
                                             hassource = True
                                     if hassource:
-                                        canvasnames.append(img["imgdir"]["imgdir"][index]["imgdir"][numberedsub]["canvas"][canvasindex]["@name"])
+                                        canvasnames.append(img["imgdir"]["imgdir"][index]["imgdir"][
+                                                           numberedsub]["canvas"][canvasindex]["@name"])
                             else:
                                 hassource = False
                                 if type(img["imgdir"]["imgdir"][index]["imgdir"][numberedsub]["canvas"]["string"]) is list:
-                                    stringcount = len(img["imgdir"]["imgdir"][index]["imgdir"][numberedsub]["canvas"]["string"])
+                                    stringcount = len(img["imgdir"]["imgdir"][index]["imgdir"][
+                                                      numberedsub]["canvas"]["string"])
                                     for stringindex in range(stringcount):
                                         if img["imgdir"]["imgdir"][index]["imgdir"][numberedsub]["canvas"]["string"][stringindex]["@name"] == "source":
-                                            rawsources.append(img["imgdir"]["imgdir"][index]["imgdir"][numberedsub]["canvas"]["string"][stringindex]["@value"])
+                                            rawsources.append(img["imgdir"]["imgdir"][index]["imgdir"][numberedsub][
+                                                              "canvas"]["string"][stringindex]["@value"])
                                             hassource = True
                                 else:
                                     if img["imgdir"]["imgdir"][index]["imgdir"][numberedsub]["canvas"]["string"]["@name"] == "source":
-                                        rawsources.append(img["imgdir"]["imgdir"][index]["imgdir"][numberedsub]["canvas"]["string"]["@value"])
+                                        rawsources.append(img["imgdir"]["imgdir"][index]["imgdir"][
+                                                          numberedsub]["canvas"]["string"]["@value"])
                                         hassource = True
                                 if hassource:
-                                    canvasnames.append(img["imgdir"]["imgdir"][index]["imgdir"][numberedsub]["canvas"]["@name"])
+                                    canvasnames.append(img["imgdir"]["imgdir"][index]["imgdir"][
+                                                       numberedsub]["canvas"]["@name"])
                         except KeyError:
                             continue
                         if len(rawsources) <= 0 or len(canvasnames) <= 0:
                             continue
                         if len(rawsources) != len(canvasnames):
-                            raise IndexError("Not exactly one source for each canvas. File: " + filepath)
+                            raise IndexError(
+                                "Not exactly one source for each canvas. File: " + filepath)
                         if len(rawsources) == 1:
-                            rawsources[0] = "../.." + rawsources[0][rawsources[0].find("img") + 3:]
-                            img["imgdir"]["imgdir"][index]["imgdir"][numberedsub] = OrderedDict([("@name", numberedsubname), ("uol", OrderedDict([("@name", canvasnames[0]), ("@value", rawsources[0])]))])
+                            rawsources[0] = "../.." + \
+                                rawsources[0][rawsources[0].find("img") + 3:]
+                            img["imgdir"]["imgdir"][index]["imgdir"][numberedsub] = OrderedDict(
+                                [("@name", numberedsubname), ("uol", OrderedDict([("@name", canvasnames[0]), ("@value", rawsources[0])]))])
                         else:
                             uollist = []
                             for rawsourceindex in range(len(rawsources)):
-                                rawsources[rawsourceindex] = "../.." + rawsources[rawsourceindex][rawsources[rawsourceindex].find("img") + 3:]
-                                uollist.append(OrderedDict([("@name", canvasnames[rawsourceindex]), ("@value", rawsources[rawsourceindex])]))
-                            img["imgdir"]["imgdir"][index]["imgdir"][numberedsub] = OrderedDict([("@name", numberedsubname), ("uol", uollist)])
+                                rawsources[rawsourceindex] = "../.." + rawsources[
+                                    rawsourceindex][rawsources[rawsourceindex].find("img") + 3:]
+                                uollist.append(OrderedDict(
+                                    [("@name", canvasnames[rawsourceindex]), ("@value", rawsources[rawsourceindex])]))
+                            img["imgdir"]["imgdir"][index]["imgdir"][numberedsub] = OrderedDict(
+                                [("@name", numberedsubname), ("uol", uollist)])
                 else:
-                    numberedsubname = img["imgdir"]["imgdir"][index]["imgdir"]["@name"]
+                    numberedsubname = img["imgdir"][
+                        "imgdir"][index]["imgdir"]["@name"]
                     rawsources = []
                     canvasnames = []
                     try:
                         if type(img["imgdir"]["imgdir"][index]["imgdir"]["canvas"]) is list:
-                            canvascount = len(img["imgdir"]["imgdir"][index]["imgdir"]["canvas"])
+                            canvascount = len(img["imgdir"]["imgdir"][
+                                              index]["imgdir"]["canvas"])
                             for canvasindex in range(canvascount):
                                 hassource = False
                                 if type(img["imgdir"]["imgdir"][index]["imgdir"]["canvas"][canvasindex]["string"]) is list:
-                                    stringcount = len(img["imgdir"]["imgdir"][index]["imgdir"]["canvas"][canvasindex]["string"])
+                                    stringcount = len(img["imgdir"]["imgdir"][index]["imgdir"][
+                                                      "canvas"][canvasindex]["string"])
                                     for stringindex in range(stringcount):
                                         if img["imgdir"]["imgdir"][index]["imgdir"]["canvas"][canvasindex]["string"][stringindex]["@name"] == "source":
-                                            rawsources.append(img["imgdir"]["imgdir"][index]["imgdir"]["canvas"][canvasindex]["string"][stringindex]["@value"])
+                                            rawsources.append(img["imgdir"]["imgdir"][index]["imgdir"]["canvas"][
+                                                              canvasindex]["string"][stringindex]["@value"])
                                             hassource = True
                                 else:
                                     if img["imgdir"]["imgdir"][index]["imgdir"]["canvas"][canvasindex]["string"]["@name"] == "source":
-                                        rawsources.append(img["imgdir"]["imgdir"][index]["imgdir"]["canvas"][canvasindex]["string"]["@value"])
+                                        rawsources.append(img["imgdir"]["imgdir"][index]["imgdir"][
+                                                          "canvas"][canvasindex]["string"]["@value"])
                                         hassource = True
                                 if hassource:
-                                    canvasnames.append(img["imgdir"]["imgdir"][index]["imgdir"]["canvas"][canvasindex]["@name"])
+                                    canvasnames.append(img["imgdir"]["imgdir"][index]["imgdir"][
+                                                       "canvas"][canvasindex]["@name"])
                         else:
                             hassource = False
                             if type(img["imgdir"]["imgdir"][index]["imgdir"]["canvas"]["string"]) is list:
-                                stringcount = len(img["imgdir"]["imgdir"][index]["imgdir"]["canvas"]["string"])
+                                stringcount = len(img["imgdir"]["imgdir"][index][
+                                                  "imgdir"]["canvas"]["string"])
                                 for stringindex in range(stringcount):
                                     if img["imgdir"]["imgdir"][index]["imgdir"]["canvas"]["string"][stringindex]["@name"] == "source":
-                                        rawsources.append(img["imgdir"]["imgdir"][index]["imgdir"]["canvas"]["string"][stringindex]["@value"])
+                                        rawsources.append(img["imgdir"]["imgdir"][index]["imgdir"][
+                                                          "canvas"]["string"][stringindex]["@value"])
                                         hassource = True
                             else:
                                 if img["imgdir"]["imgdir"][index]["imgdir"]["canvas"]["string"]["@name"] == "source":
-                                    rawsources.append(img["imgdir"]["imgdir"][index]["imgdir"]["canvas"]["string"]["@value"])
+                                    rawsources.append(img["imgdir"]["imgdir"][index][
+                                                      "imgdir"]["canvas"]["string"]["@value"])
                                     hassource = True
                             if hassource:
-                                canvasnames.append(img["imgdir"]["imgdir"][index]["imgdir"]["canvas"]["@name"])
+                                canvasnames.append(img["imgdir"]["imgdir"][index][
+                                                   "imgdir"]["canvas"]["@name"])
                     except KeyError:
                         continue
                     if len(rawsources) <= 0 or len(canvasnames) <= 0:
                         continue
                     if len(rawsources) != len(canvasnames):
-                        raise IndexError("Not exactly one source for each canvas. File: " + filepath)
+                        raise IndexError(
+                            "Not exactly one source for each canvas. File: " + filepath)
                     if len(rawsources) == 1:
-                        rawsources[0] = "../.." + rawsources[0][rawsources[0].find("img") + 3:]
-                        img["imgdir"]["imgdir"][index]["imgdir"] = OrderedDict([("@name", numberedsubname), ("uol", OrderedDict([("@name", canvasnames[0]), ("@value", rawsources[0])]))])
+                        rawsources[0] = "../.." + \
+                            rawsources[0][rawsources[0].find("img") + 3:]
+                        img["imgdir"]["imgdir"][index]["imgdir"] = OrderedDict(
+                            [("@name", numberedsubname), ("uol", OrderedDict([("@name", canvasnames[0]), ("@value", rawsources[0])]))])
                     else:
                         uollist = []
                         for rawsourceindex in range(len(rawsources)):
-                            rawsources[rawsourceindex] = "../.." + rawsources[rawsourceindex][rawsources[rawsourceindex].find("img") + 3:]
-                            uollist.append(OrderedDict([("@name", canvasnames[rawsourceindex]), ("@value", rawsources[rawsourceindex])]))
-                        img["imgdir"]["imgdir"][index]["imgdir"] = OrderedDict([("@name", numberedsubname), ("uol", uollist)])
+                            rawsources[rawsourceindex] = "../.." + rawsources[
+                                rawsourceindex][rawsources[rawsourceindex].find("img") + 3:]
+                            uollist.append(OrderedDict(
+                                [("@name", canvasnames[rawsourceindex]), ("@value", rawsources[rawsourceindex])]))
+                        img["imgdir"]["imgdir"][index]["imgdir"] = OrderedDict(
+                            [("@name", numberedsubname), ("uol", uollist)])
             except KeyError:
                 continue
     filenamelen = len(filepath.split("/")[-1])
     newdir = filepath[:-1 * filenamelen] + "converted"
     os.makedirs(newdir, exist_ok=True)
-    with open(newdir + "/" + filepath.split("/")[-1], mode="w", encoding="utf-8") as newimg:
-        xmltodict.unparse(img, output=newimg, encoding="utf-8")
+
+    outfilename = newdir + "/" + filepath.split('/')[-1]
+    with open(outfilename, "w", encoding="utf8") as f:
+        xmltodict.unparse(img, output=f, encoding="utf-8")

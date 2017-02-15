@@ -1,7 +1,16 @@
-# Searches for all mobs that have deadly attacks (known as 1/1 attacks/mechanic).
-# These lower players' HP and MP to 1 automatically.
-# Must be placed in <server>/wz directory.
+#!/usr/bin/env python
 
+"""
+Any version of Python
+
+Searches for all mobs that have deadly attacks
+(known as 1/1 attacks/mechanic).
+These lower players' HP and MP to 1 automatically.
+
+Must be placed in <server>/wz directory.
+"""
+
+from __future__ import print_function
 import os
 
 candidates = []
