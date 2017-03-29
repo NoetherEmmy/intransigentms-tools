@@ -1,7 +1,7 @@
 Dialogue.js / Dialogue.min.js
 =============================
 
-####Author: Emmy Noether of IntransigentMS ([intransigentms.com](http://intransigentms.com/splash.html))
+#### Author: Emmy Noether of IntransigentMS ([intransigentms.com](http://intransigentms.com/splash.html))
 ____________________________
 
 Table Of Contents
